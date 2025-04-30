@@ -114,7 +114,7 @@ const WeatherForecast = ({coords}: CoordinateOptions) => {
 		updateWindArrows();
 
 		return (
-			<div className="rounded-2xl dark:bg-neutral-100/25 dark:text-neutral-200">
+			<div className="rounded-2xl dark:bg-neutral-100/15 shadow-lg dark:text-neutral-200 lg:h-[325px] lg:w-[950px]">
 				<div className="text-xl pt-2">
 					{officeCode?.length && (
 						<div>
@@ -127,13 +127,13 @@ const WeatherForecast = ({coords}: CoordinateOptions) => {
 					)}
 				</div>
 
-				<div className="flex flex-col gap-2 p-2 sm:flex-row items-center sm:gap-6 sm:py-1">
+				<div className="flex flex-col gap-2 p-2 pr-6 sm:flex-row items-center sm:gap-6 sm:py-1 overflow-y-hidden overscroll-y-contain scroll-smooth">
 					{forecast?.periods?.map((period) => {
 						return (
 							<>
 							{period.number === 1 && (
 								<div key={`period${period.number}`}
-									 className="flex flex-col gap-2 p-8 sm:flex-row items-center sm:gap-6 sm:py-4">
+									 className="flex flex-col gap-2 p-8 sm:flex-row items-center sm:gap-2.5 sm:py-2">
 									<div className="space-y-2 font-medium text-center">
 										<div className="text-2xl pb-2">{period.name}</div>
 										<img className="mx-auto block h-24 rounded-sm sm:mx-0 sm:shrink-0 scale-125"
@@ -142,11 +142,11 @@ const WeatherForecast = ({coords}: CoordinateOptions) => {
 										<div className="text-xs mt-[-0.75rem]">Wind: {period.windSpeed.replace(" to ", "-")} <i className={`arrow-${period.windDirection} fa-light fa-arrow-up`}></i></div>
 									</div>
 									<div className="space-y-1/2 text-center sm:text-left">
-										<div className="w-2xs text-sm pt-2">{period.detailedForecast}</div>
+										<div className="w-2xs text-sm pt-2 sm:pl-4">{period.detailedForecast}</div>
 									</div>
 								</div>
 							)}
-							{period.number > 1 && period.number < 5 && (
+							{period.number > 1 && (
 								<div key={`period${period.number}`}
 									 className="flex flex-col py-2 sm:flex-row sm:items-center sm:py-2">
 									<div className="space-y-1/2 font-medium size-[8rem] items-center">
@@ -164,14 +164,12 @@ const WeatherForecast = ({coords}: CoordinateOptions) => {
 					})}
 				</div>
 
-				<div className="text-xs italic pb-2">Updated
+				<div className="text-xs italic pb-2 text-cyan-100">Updated
 					at {epochToHuman(forecast?.updateTime.milliseconds)} ({point?.timeZone})
 				</div>
 			</div>
 		);
 	}
 }
-
-// <div className="weather-forecast-forecast-detailed">{period.detailedForecast}</div>
 
 export default WeatherForecast;
