@@ -4,7 +4,9 @@ import Weather from "./components/Weather.tsx";
 const App = () => {
 
 	return (
-		<Weather/>
+		<div>
+			<Weather/>
+		</div>
 	);
 };
 

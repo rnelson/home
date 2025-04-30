@@ -64,17 +64,20 @@ const updateWindArrows = (): void => {
 
 const WeatherForecast = ({coords}: CoordinateOptions) => {
 	const [state, setState] = useState("");
+	const [officeCode, setOfficeCode] = useState("");
 	const [point, setPoint] = useState<Point>();
 	const [forecast, setForecast] = useState<Forecast>();
 	const [error, setError] = useState<Error>();
 
 	const fetchForecast = useCallback(async (loc: Array<number> | undefined): Promise<undefined> => {
 		setState("loading");
+		setOfficeCode("")
 		setPoint(undefined);
 		setForecast(undefined);
 
 		Weather.points(loc).get()
 			.then((p: Point) => {
+				setOfficeCode(p.office.id);
 				setPoint(p);
 				return p.getGridPointForecast();
 			})
@@ -111,32 +114,57 @@ const WeatherForecast = ({coords}: CoordinateOptions) => {
 		updateWindArrows();
 
 		return (
-			<div>
-				<div>
-					Forecast for {formatDegrees(coords!.latitude, false)}, {formatDegrees(coords!.longitude, true)}
+			<div className="rounded-2xl dark:bg-neutral-100/25 dark:text-neutral-200">
+				<div className="text-xl pt-2">
+					{officeCode?.length && (
+						<div>
+							<div>Forecast for {officeCode}</div>
+							<div className="text-base">{formatDegrees(coords!.latitude, false)}, {formatDegrees(coords!.longitude, true)}</div>
+						</div>
+					)}
+					{!officeCode?.length && (
+						<>Forecast for {formatDegrees(coords!.latitude, false)}, {formatDegrees(coords!.longitude, true)}</>
+					)}
 				</div>
 
-				<div>
+				<div className="flex flex-col gap-2 p-2 sm:flex-row items-center sm:gap-6 sm:py-1">
 					{forecast?.periods?.map((period) => {
 						return (
-							<div key={`period${period.number}`}
-								 className="flex flex-col gap-2 p-8 sm:flex-row sm:items-center sm:gap-6 sm:py-4">
-								<div className="space-y-2 font-medium text-center sm:text-left items-center">
-									<div className="mx-auto block sm:mx-0 sm:shrink-0">{period.name}</div>
-									<img className="mx-auto block h-24 rounded-sm sm:mx-0 sm:shrink-0"
-										 src={period.icon} alt={period.detailedForecast}/>
+							<>
+							{period.number === 1 && (
+								<div key={`period${period.number}`}
+									 className="flex flex-col gap-2 p-8 sm:flex-row items-center sm:gap-6 sm:py-4">
+									<div className="space-y-2 font-medium text-center">
+										<div className="text-2xl pb-2">{period.name}</div>
+										<img className="mx-auto block h-24 rounded-sm sm:mx-0 sm:shrink-0 scale-125"
+											 src={period.icon} alt={period.detailedForecast}/>
+										<div className="text-lg pt-2">{period.temperature.value}&#176; {period.temperature.unit}</div>
+										<div className="text-xs mt-[-0.75rem]">Wind: {period.windSpeed.replace(" to ", "-")} <i className={`arrow-${period.windDirection} fa-light fa-arrow-up`}></i></div>
+									</div>
+									<div className="space-y-1/2 text-center sm:text-left">
+										<div className="w-2xs text-sm pt-2">{period.detailedForecast}</div>
+									</div>
 								</div>
-								<div className="space-y-1/2 text-center sm:text-left">
-									<div>{period.temperature.value}&#176; {period.temperature.unit}</div>
-									<div>Wind: {period.windSpeed.replace(" to ", "-")} <i className={`arrow-${period.windDirection} fa-light fa-arrow-up`}></i></div>
-									<div>{period.shortForecast}</div>
+							)}
+							{period.number > 1 && period.number < 5 && (
+								<div key={`period${period.number}`}
+									 className="flex flex-col py-2 sm:flex-row sm:items-center sm:py-2">
+									<div className="space-y-1/2 font-medium size-[8rem] items-center">
+										<div className="text-medium h-4 align-bottom mt-[-0.5rem]">{period.name}</div>
+										<div className="flex justify-center align-center">
+											<img className="mx-0 block h-24 rounded-md sm:mx-0 sm:shrink-0 scale-75 place-self-center-safe"
+												 src={period.icon} alt={period.detailedForecast}/>
+										</div>
+										<div className="text-lg mt-[-0.25rem]">{period.temperature.value}&#176; {period.temperature.unit}</div>
+									</div>
 								</div>
-							</div>
+							)}
+							</>
 						)
 					})}
 				</div>
 
-				<div>Updated
+				<div className="text-xs italic pb-2">Updated
 					at {epochToHuman(forecast?.updateTime.milliseconds)} ({point?.timeZone})
 				</div>
 			</div>
